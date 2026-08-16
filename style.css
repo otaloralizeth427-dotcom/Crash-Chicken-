@@ -1,2 +1,72 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@800;900&display=swap');
-*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at top,#dff2c2,#7ab35b);font-family:Nunito,sans-serif;color:#193041}main{width:min(1000px,94vw);padding:22px 0}header{display:flex;align-items:end;justify-content:space-between;margin:0 4px 16px}header p{margin:0;color:#457836;font-size:.68rem;letter-spacing:.16em}h1{margin:0;font:700 clamp(2rem,5vw,3.5rem)/.9 Fredoka;color:#fff6d5;text-shadow:0 4px #31512c}h1 span{color:#ffcf4e}.score{display:flex;gap:8px}.score div{min-width:78px;padding:5px 10px;text-align:center;background:#fff6d8;border:3px solid #375a35;border-radius:12px;font-size:.62rem;letter-spacing:.08em}.score b{display:block;font-size:1.3rem;letter-spacing:0}#game{position:relative;overflow:hidden;height:min(680px,70vh);min-height:540px;border:5px solid #25462d;border-radius:22px;background:#6eb245;box-shadow:0 10px #25462d;outline:0}.goal,.start{height:10%;display:grid;place-items:center;color:#fff0b5;font-family:Fredoka;letter-spacing:.12em;text-shadow:0 2px #346b2d}.road{height:20%;position:relative;background:linear-gradient(#20333d,#304852 12%,#2b414b 88%,#20333d);border-block:5px solid #c09a52;box-shadow:inset 0 5px #e3c377,inset 0 -5px #e3c377}.road i{position:absolute;top:49%;width:100%;height:7px;background:repeating-linear-gradient(90deg,transparent 0 3%,#eee 3% 7%,transparent 7% 11%)}.grass{height:10%;background:linear-gradient(#76b947,#579b38,#76b947);border-block:4px solid #cda95b}.start{height:10%;align-items:end;padding-bottom:8px}.car{position:absolute;width:clamp(76px,11vw,110px);height:58px;z-index:4;filter:drop-shadow(0 5px 2px #07141a99) hue-rotate(var(--hue,0deg))}.car img,.corn img,#chicken img{width:100%;height:100%;object-fit:contain}.corn{position:absolute;z-index:6;width:40px;height:54px;filter:drop-shadow(0 3px 1px #14291699);transition:.15s}.corn.collected{opacity:0;transform:scale(.2) rotate(25deg)}#chicken{position:absolute;width:58px;height:58px;z-index:7;left:calc(50% - 29px);bottom:2.5%;transition:left .1s,bottom .1s;filter:drop-shadow(0 5px 1px #44351b88)}#message{position:absolute;inset:0;z-index:10;display:grid;place-content:center;text-align:center;color:#fff7d9;background:#13282baa;backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:.2s}#message.show{opacity:1;pointer-events:auto}#message h2{margin:0;font:700 clamp(2rem,6vw,4rem)/1 Fredoka;text-shadow:0 4px #27452d}#message p{margin:12px 0 19px}#dead{display:none;width:min(180px,46vw);margin:auto}#message.crash #dead{display:block}button{justify-self:center;border:0;border-radius:999px;padding:12px 28px;background:#ffce4c;color:#314029;box-shadow:0 4px #b47625;font:900 1rem Nunito;cursor:pointer}.help,footer{text-align:center;color:#335b32;font-size:.85rem;font-weight:800}.help{margin:19px 0 8px}footer{font-size:.75rem}@media(max-width:560px){.score div{min-width:59px;padding-inline:6px}#chicken{width:52px;height:52px;left:calc(50% - 26px)}}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at top,#dff2c2,#7ab35b);font-family:Nunito,sans-serif;color:#193041;transition:background .4s}
+body.level2{background:radial-gradient(circle at top,#eafde0,#5c9f6e)}
+main{width:min(1000px,94vw);padding:22px 0}
+header{display:flex;align-items:end;justify-content:space-between;flex-wrap:wrap;row-gap:8px;margin:0 4px 16px}
+header p{margin:0;color:#457836;font-size:.68rem;letter-spacing:.16em}
+body.level2 header p{color:#2f7a4a}
+h1{margin:0;font:700 clamp(2rem,5vw,3.5rem)/.9 Fredoka;color:#fff6d5;text-shadow:0 4px #31512c}
+h1 span{color:#ffcf4e}
+.score{display:flex;gap:8px}
+.score div{min-width:78px;padding:5px 10px;text-align:center;background:#fff6d8;border:3px solid #375a35;border-radius:12px;font-size:.62rem;letter-spacing:.08em}
+.score b{display:block;font-size:1.3rem;letter-spacing:0}
+
+/* Tablero: comparten estructura Nivel 1 y Nivel 2 */
+#game,#game2{position:relative;overflow:hidden;height:min(680px,70vh);min-height:540px;border:5px solid #25462d;border-radius:22px;background:#6eb245;box-shadow:0 10px #25462d;outline:0;touch-action:none}
+#game2{height:min(780px,76vh);min-height:560px;border-color:#1f4a2e;box-shadow:0 10px #1f4a2e}
+.hidden{display:none}
+
+.goal,.start{height:10%;display:grid;place-items:center;color:#fff0b5;font-family:Fredoka;letter-spacing:.12em;text-shadow:0 2px #346b2d}
+.road{height:20%;position:relative;background:linear-gradient(#20333d,#304852 12%,#2b414b 88%,#20333d);border-block:5px solid #c09a52;box-shadow:inset 0 5px #e3c377,inset 0 -5px #e3c377}
+.road i{position:absolute;top:49%;width:100%;height:7px;background:repeating-linear-gradient(90deg,transparent 0 3%,#eee 3% 7%,transparent 7% 11%)}
+.grass{height:10%;background:linear-gradient(#76b947,#579b38,#76b947);border-block:4px solid #cda95b}
+#game2 .grass{background:linear-gradient(#bff5a8,#7fd15e,#bff5a8);border-block-color:#a9c96a}
+.start{height:10%;align-items:end;padding-bottom:8px}
+
+.car{position:absolute;width:clamp(76px,11vw,110px);height:58px;z-index:4;filter:drop-shadow(0 5px 2px #07141a99) hue-rotate(var(--hue,0deg))}
+/* Nivel 2: tamaños ligados a la altura del viewport, para que autos y carriles
+   escalen juntos (10 carreteras) sin desbordarse en ningún alto de pantalla */
+#game2 .car{width:clamp(40px,6.2vw,64px);height:clamp(18px,2.6vh,30px)}
+#game2 .car.sub{width:clamp(30px,4.6vw,48px);height:clamp(14px,2vh,22px)}
+.car img,.corn img,#chicken img,#chicken2 img{width:100%;height:100%;object-fit:contain}
+
+.corn{position:absolute;z-index:6;width:40px;height:54px;filter:drop-shadow(0 3px 1px #14291699);transition:.15s}
+.corn.collected{opacity:0;transform:scale(.2) rotate(25deg)}
+#game2 .corn{width:clamp(16px,2.2vh,24px);height:clamp(21px,3vh,32px)}
+
+#chicken,#chicken2{position:absolute;width:58px;height:58px;z-index:7;left:calc(50% - 29px);bottom:2.5%;transition:left .1s,bottom .1s;filter:drop-shadow(0 5px 1px #44351b88)}
+#chicken2{width:clamp(30px,4.4vh,42px);height:clamp(30px,4.4vh,42px);left:calc(50% - 19px)}
+
+#message,#message2,#levelUp{position:absolute;inset:0;z-index:10;display:grid;place-content:center;text-align:center;color:#fff7d9;background:#13282baa;backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:.2s}
+#message.show,#message2.show,#levelUp.show{opacity:1;pointer-events:auto}
+#message h2,#message2 h2,#levelUp h2{margin:0;font:700 clamp(2rem,6vw,4rem)/1 Fredoka;text-shadow:0 4px #27452d}
+#message p,#message2 p,#levelUp p{margin:12px 0 19px}
+#dead,#dead2{display:none;width:min(180px,46vw);margin:auto}
+#message.crash #dead,#message2.crash #dead2{display:block}
+#levelUp img{width:min(190px,48vw);margin:auto;display:block}
+#levelUp{z-index:11}
+
+button{justify-self:center;border:0;border-radius:999px;padding:12px 28px;background:#ffce4c;color:#314029;box-shadow:0 4px #b47625;font:900 1rem Nunito;cursor:pointer}
+
+.help,footer{text-align:center;color:#335b32;font-size:.85rem;font-weight:800}
+.help{margin:19px 0 8px}
+footer{font-size:.75rem}
+
+@media(max-width:560px){
+  .score div{min-width:59px;padding-inline:6px}
+  #chicken{width:52px;height:52px;left:calc(50% - 26px)}
+}
+@media(max-height:520px){
+  main{padding:10px 0}
+  header{margin-bottom:8px}
+  h1{font-size:clamp(1.4rem,4vw,2.2rem)}
+  #game,#game2{height:min(480px,82vh);min-height:320px}
+  .help{margin:8px 0 4px}
+  /* en pantallas muy bajas (móvil horizontal) los carriles se comprimen: se
+     reduce el piso de los clamp para que autos/maíz/pollito sigan cabiendo */
+  #game2 .car{height:clamp(10px,2.6vh,30px)}
+  #game2 .car.sub{height:clamp(8px,2vh,22px)}
+  #game2 .corn{width:clamp(10px,2.2vh,24px);height:clamp(13px,3vh,32px)}
+  #chicken2{width:clamp(20px,4.4vh,42px);height:clamp(20px,4.4vh,42px)}
+}
