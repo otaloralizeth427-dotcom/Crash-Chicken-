@@ -13,4 +13,7 @@
 #game.world-two{background:radial-gradient(circle at 50% 8%,#b3212d 0%,#641722 38%,#210d19 100%);border-color:#3c101a;box-shadow:0 10px #180910}
 #game.world-two:before{content:'⚠  ¡TIEMBLA!  ⚠';position:absolute;top:8%;left:0;width:100%;z-index:1;color:#ffb0a2;text-align:center;font:700 clamp(1.2rem,4vw,2.5rem) Fredoka;letter-spacing:.18em;text-shadow:0 3px #4c0d18;opacity:.9}
 .world-two #chicken{filter:drop-shadow(0 5px 1px #050106) brightness(.85)}
+.game{touch-action:none}
+#game{touch-action:none}
+@media(max-width:560px){#game{width:100%;height:min(78vh,680px);min-height:440px;border-width:4px}main{padding:12px 0}.help{padding-inline:12px}footer{padding-inline:8px}.score{gap:4px}}
 .world-two .goal{display:grid;position:absolute;top:2%;left:12%;width:76%;height:12%;z-index:5;border:3px solid #ffb15c;border-radius:18px;background:linear-gradient(#ff4b36,#99162c);color:#ffe5a3;text-shadow:0 3px #5b1020;box-shadow:0 0 22px #ff4b3688;font-size:1.1rem}
