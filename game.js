@@ -8,6 +8,9 @@ function finish(){world2()}
 function world2(){world=2;game.classList.add('world-two');help.textContent='Llega al portal rojo sin que te golpeen los objetos.';document.querySelectorAll('.car,.corn').forEach(x=>x.remove());clean();pos={x:50,y:8};world2Time=0;spawnTimer=.25;draw();message.classList.remove('show','crash');playing=true;last=performance.now();game.focus();cancelAnimationFrame(frame);frame=requestAnimationFrame(loop)}
 document.addEventListener('keydown',()=>{if(world===2&&playing&&pos.y>=88)end(false)});
 setInterval(()=>{if(world===2&&playing){spawn();if(Math.random()>.35)spawn()}},450);
+// Esta rama contiene únicamente el mundo 2 de Esteban.
+document.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='r'){e.preventDefault();world2()}});
+world2();
 let touchStart=null;
 game.addEventListener('touchstart',event=>{touchStart=event.changedTouches[0];event.preventDefault()},{passive:false});
 game.addEventListener('touchend',event=>{if(!touchStart)return;const touch=event.changedTouches[0],dx=touch.clientX-touchStart.clientX,dy=touch.clientY-touchStart.clientY;touchStart=null;if(Math.max(Math.abs(dx),Math.abs(dy))<18)return;move(Math.abs(dx)>Math.abs(dy)?(dx>0?'ArrowRight':'ArrowLeft'):(dy>0?'ArrowDown':'ArrowUp'));event.preventDefault()},{passive:false});
