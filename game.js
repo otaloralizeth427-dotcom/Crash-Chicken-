@@ -11,6 +11,7 @@ setInterval(()=>{if(world===2&&playing){spawn();if(Math.random()>.35)spawn()}},4
 // Esta rama contiene únicamente el mundo 2 de Esteban.
 document.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='r'){e.preventDefault();world2()}});
 world2();
+function end(crash=true){playing=false;cancelAnimationFrame(frame);game.classList.remove('shaking');score=Math.max(0,score);if(world===2&&!crash){score+=10;scoreEl.textContent=score}if(score>best){best=score;localStorage.setItem('crashChickenBest',best);bestEl.textContent=best}show(crash?'¡Crash!':'¡Meta alcanzada!',crash?`Conseguiste ${score} puntos.`:`¡Llegaste a salvo! +10 puntos. Total: ${score}`,world===2?'REPETIR MUNDO 2':'REINTENTAR',crash)}
 let touchStart=null;
 game.addEventListener('touchstart',event=>{touchStart=event.changedTouches[0];event.preventDefault()},{passive:false});
 game.addEventListener('touchend',event=>{if(!touchStart)return;const touch=event.changedTouches[0],dx=touch.clientX-touchStart.clientX,dy=touch.clientY-touchStart.clientY;touchStart=null;if(Math.max(Math.abs(dx),Math.abs(dy))<18)return;move(Math.abs(dx)>Math.abs(dy)?(dx>0?'ArrowRight':'ArrowLeft'):(dy>0?'ArrowDown':'ArrowUp'));event.preventDefault()},{passive:false});
