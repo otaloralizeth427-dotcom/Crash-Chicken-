@@ -5,103 +5,135 @@ const tagline = document.querySelector('#tagline');
 const help = document.querySelector('#help');
 const levelUp = document.querySelector('#levelUp');
 const toLevel2Btn = document.querySelector('#toLevel2');
+const game1El = document.querySelector('#game');
+const game2El = document.querySelector('#game2');
+const world2El = document.querySelector('#world2');
 
 let best = +localStorage.getItem('crashChickenBest') || 0;
 bestEl.textContent = best;
 
-/* ===== geometría del tablero del Nivel 2 (10 carreteras) ===== */
+/* ===== geometría del Nivel 2: un "mundo" con scroll vertical =====
+   La ventana visible (#game2) mide EXACTAMENTE lo mismo que el tablero del
+   Nivel 1 (mismo alto, mismas proporciones de carretera/pasto). El mundo
+   (#world2) es varias veces más alto que esa ventana y se desplaza con
+   translateY según el jugador avanza — como una cámara que lo sigue — así
+   ninguna carretera se encoge para "caber" en pantalla: las 10 carreteras
+   no están visibles a la vez, se recorren una tras otra.
+   Todo se mide en HVU (1 HVU = 1% del alto de la ventana #game2) y se
+   convierte a % del propio alto del mundo para el CSS: son proporciones
+   puras, por lo que el layout no depende de ningún tamaño de pantalla
+   concreto ni necesita recalcularse al redimensionar. */
 function layoutLevel2() {
 	// g = orden de juego: 0 = primera carretera desde INICIO ... 9 = última antes de LLEGADA
-	const ROADS = 10, GOAL = 6, START = 6, SINGLE_W = 2.2, DOUBLE_W = 5, GRASS_W = 1;
+	const ROADS = 10, GOAL_U = 10, START_U = 10, SINGLE_U = 20, DOUBLE_U = 34, GRASS_U = 10;
 	const isDoubleG = g => g >= 6; // carreteras 7-10 (últimas 4 antes de la meta) = doble vía
-	const weightOf = g => isDoubleG(g) ? DOUBLE_W : SINGLE_W;
-	let totalW = (ROADS - 1) * GRASS_W;
-	for (let g = 0; g < ROADS; g++) totalW += weightOf(g);
-	const unit = (100 - GOAL - START) / totalW;
-	const grassH = unit * GRASS_W;
-	const domTop = [], domH = []; // de arriba (meta) hacia abajo (inicio)
-	let y = GOAL;
+	const weightOf = g => isDoubleG(g) ? DOUBLE_U : SINGLE_U;
+	let worldH_U = GOAL_U + START_U + (ROADS - 1) * GRASS_U;
+	for (let g = 0; g < ROADS; g++) worldH_U += weightOf(g);
+
+	// posiciones en HVU, de arriba (meta) hacia abajo (inicio) — igual que el
+	// Nivel 1, INICIO queda pegado a la primera carretera (sin pasto de por medio)
+	const domTopU = [], domHU = [];
+	let y = GOAL_U;
 	for (let d = 0; d < ROADS; d++) {
-		const g = ROADS - 1 - d, h = weightOf(g) * unit;
-		domTop.push(y);
-		domH.push(h);
+		const g = ROADS - 1 - d, h = weightOf(g);
+		domTopU.push(y);
+		domHU.push(h);
 		y += h;
-		if (d < ROADS - 1) y += grassH;
+		if (d < ROADS - 1) y += GRASS_U;
 	}
-	const roadTop = g => domTop[ROADS - 1 - g];
-	const roadH = g => domH[ROADS - 1 - g];
-	return { ROADS, GOAL, START, grassH, roadTop, roadH, isDoubleG };
+	const pct = u => u / worldH_U * 100; // HVU -> % del alto propio del mundo
+	const roadTop = g => pct(domTopU[ROADS - 1 - g]);
+	const roadH = g => pct(domHU[ROADS - 1 - g]);
+	return {
+		ROADS, worldH_U, isDoubleG, roadTop, roadH,
+		goalPct: pct(GOAL_U), startPct: pct(START_U), grassPct: pct(GRASS_U)
+	};
 }
 const L2 = layoutLevel2();
 
-/* Construye las 10 carreteras (+9 franjas de pasto) del Nivel 2 reutilizando
-   las mismas clases .road/.grass del Nivel 1, insertadas antes de .start.
-   Las carreteras 7-10 (doble vía) se generan más anchas, como una vía real. */
+/* Construye las 10 carreteras (+9 franjas de pasto) del Nivel 2 dentro de
+   #world2, reutilizando las mismas clases .road/.grass del Nivel 1 (flujo
+   normal en bloque: solo hace falta la altura de cada una, en el orden
+   correcto, igual que ya hacía el Nivel 1). */
 function buildLevel2Board() {
-	const board = document.querySelector('#game2');
-	const startEl = board.querySelector('.start');
-	board.querySelector('.goal').style.height = L2.GOAL + '%';
-	startEl.style.height = L2.START + '%';
-	board.querySelectorAll('.road,.grass').forEach(e => e.remove());
+	world2El.style.height = L2.worldH_U + '%';
+	const startEl = world2El.querySelector('.start');
+	world2El.querySelector('.goal').style.height = L2.goalPct + '%';
+	startEl.style.height = L2.startPct + '%';
+	world2El.querySelectorAll('.road,.grass').forEach(e => e.remove());
 	for (let d = 0; d < L2.ROADS; d++) {
 		const g = L2.ROADS - 1 - d;
 		const road = document.createElement('div');
 		road.className = 'road' + (L2.isDoubleG(g) ? ' double' : '');
 		road.style.height = L2.roadH(g) + '%';
 		road.innerHTML = '<i></i>';
-		board.insertBefore(road, startEl);
+		world2El.insertBefore(road, startEl);
 		if (d < L2.ROADS - 1) {
 			const grass = document.createElement('div');
 			grass.className = 'grass';
-			grass.style.height = L2.grassH + '%';
-			board.insertBefore(grass, startEl);
+			grass.style.height = L2.grassPct + '%';
+			world2El.insertBefore(grass, startEl);
 		}
 	}
 }
 buildLevel2Board();
 
-/* Carreteras 1-6: vía sencilla. Carreteras 7-10: doble vía (dos carriles
-   independientes, sentidos opuestos, velocidades y spawns propios) */
+/* Carreteras 1-6: vía sencilla, dificultad creciente. Carreteras 7-10: doble
+   vía (dos carriles independientes, sentidos opuestos, velocidad y spawn
+   propios). La carretera 1 (justo después de INICIO) arranca más lenta y
+   con los autos lejos del centro, para que el jugador tenga tiempo de
+   reaccionar y nunca muera en el primer paso. */
 function makeLevel2Lanes() {
 	const lanes = [];
-	const single = (g, d, s, h, x) => lanes.push({ top: L2.roadTop(g) + L2.roadH(g) * .08, d, s, h, x });
+	const single = (g, d, s, h, x) => lanes.push({ top: L2.roadTop(g) + L2.roadH(g) * .3, d, s, h, x });
 	const dual = (g, d1, s1, h1, x1, d2, s2, h2, x2) => {
 		const rh = L2.roadH(g);
-		lanes.push({ top: L2.roadTop(g) + rh * .08, d: d1, s: s1, h: h1, x: x1, sub: true });
-		lanes.push({ top: L2.roadTop(g) + rh * .54, d: d2, s: s2, h: h2, x: x2, sub: true });
+		lanes.push({ top: L2.roadTop(g) + rh * .1, d: d1, s: s1, h: h1, x: x1 });
+		lanes.push({ top: L2.roadTop(g) + rh * .55, d: d2, s: s2, h: h2, x: x2 });
 	};
-	single(0, 1, 11, [100, 220], [15, 65]);
-	single(1, -1, 13, [40, 300], [5, 55]);
-	single(2, 1, 15, [190, 10], [25, 75]);
-	single(3, -1, 16, [260, 80], [0, 50]);
-	single(4, 1, 18, [140, 320], [35, 85]);
-	single(5, -1, 19, [70, 200], [10, 60]);
-	dual(6, 1, 19, [180, 30], [10, 60], -1, 16, [300, 90], [30, 80]);
-	dual(7, -1, 21, [50, 250], [0, 50], 1, 18, [220, 130], [20, 70]);
-	dual(8, 1, 23, [100, 340], [15, 65], -1, 20, [280, 60], [35, 85]);
-	dual(9, -1, 25, [150, 15], [5, 55], 1, 22, [320, 200], [25, 75]);
+	single(0, 1, 10, [100, 220], [72, 18]);
+	single(1, -1, 12, [40, 300], [10, 60]);
+	single(2, 1, 14, [190, 10], [25, 75]);
+	single(3, -1, 15, [260, 80], [0, 55]);
+	single(4, 1, 17, [140, 320], [35, 85]);
+	single(5, -1, 18, [70, 200], [10, 65]);
+	dual(6, 1, 17, [180, 30], [10, 60], -1, 15, [300, 90], [35, 80]);
+	dual(7, -1, 19, [50, 250], [0, 50], 1, 16, [220, 130], [25, 70]);
+	dual(8, 1, 21, [100, 340], [15, 65], -1, 18, [280, 60], [40, 85]);
+	dual(9, -1, 23, [150, 15], [5, 55], 1, 20, [320, 200], [30, 75]);
 	return lanes;
 }
 
 function makeLevel2Items() {
 	const at = (g, x) => ({ x, t: L2.roadTop(g) + L2.roadH(g) * .5 });
 	return {
-		corn: [at(0, 45), at(2, 20), at(4, 70), at(6, 78)],
-		toxic: [at(1, 80), at(3, 15), at(6, 42), at(8, 60), at(9, 55)]
+		corn: [at(0, 45), at(2, 20), at(4, 70), at(6, 78), at(8, 40)],
+		toxic: [at(1, 80), at(3, 15), at(6, 40), at(7, 65), at(9, 55)]
 	};
 }
 const level2Items = makeLevel2Items();
 
-/* ===== configuración de ambos niveles ===== */
+/* ===== configuración de ambos niveles =====
+   `game`   = sección visible/tabindex (se muestra/oculta, recibe foco y
+              los controles táctiles).
+   `world`  = raíz donde viven carreteras/autos/maíz/pollito y sobre la que
+              se posicionan en %. En el Nivel 1 es la misma que `game`; en
+              el Nivel 2 es #world2 (el mundo largo que hace scroll).
+   `worldH` = alto del mundo en HVU (100 = mismo alto que la ventana, sin
+              scroll: así el Nivel 1 usa exactamente la misma fórmula).
+   `anchorY`= HVU desde abajo en los que la cámara empieza a seguir al
+              jugador (antes de eso se ve tal cual, como en el Nivel 1). */
 const boards = {
 	1: {
 		num: 1,
-		game: document.querySelector('#game'),
+		game: game1El,
+		world: game1El,
 		chicken: document.querySelector('#chicken'),
 		chickenHalf: 29,
 		message: document.querySelector('#message'),
 		play: document.querySelector('#play'),
-		startY: 4, stepY: 10, winY: 91,
+		startY: 4, stepY: 10, winY: 91, worldH: 100, anchorY: 100,
 		lanes: [
 			{ top: 17, d: 1, s: 12, h: [275, 190], x: [10, 66] },
 			{ top: 47, d: -1, s: 17, h: [35, 195], x: [10, 66] },
@@ -114,16 +146,17 @@ const boards = {
 	},
 	2: {
 		num: 2,
-		game: document.querySelector('#game2'),
+		game: game2El,
+		world: world2El,
 		chicken: document.querySelector('#chicken2'),
-		chickenHalf: 23,
+		chickenHalf: 29,
 		message: document.querySelector('#message2'),
 		play: document.querySelector('#play2'),
-		startY: 4, stepY: 5, winY: 95,
+		startY: 4, stepY: 10, winY: L2.worldH_U - 9, worldH: L2.worldH_U, anchorY: 30,
 		lanes: makeLevel2Lanes(),
 		corn: level2Items.corn,
 		toxic: level2Items.toxic,
-		tagline: 'NIVEL 2 · DOBLE VÍA',
+		tagline: 'NIVEL 2 · CARRETERA DOBLE',
 		helpText: 'Recoge maíz (+25) y esquiva el maíz rojo. Toca, desliza o usa las flechas.'
 	}
 };
@@ -141,26 +174,26 @@ function setLevel(n) {
 }
 
 function makeCars() {
-	cur.game.querySelectorAll('.car').forEach(x => x.remove());
+	cur.world.querySelectorAll('.car').forEach(x => x.remove());
 	cars = cur.lanes.flatMap((l, n) => l.x.map((x, i) => {
 		const e = document.createElement('div');
-		e.className = 'car' + (l.sub ? ' sub' : '');
+		e.className = 'car';
 		e.innerHTML = '<img src="assets/car.png" alt="Auto">';
 		e.style.setProperty('--hue', `${l.h[i]}deg`);
-		cur.game.append(e);
+		cur.world.append(e);
 		return { e, n, x };
 	}));
 }
 
 function makeCorn() {
-	cur.game.querySelectorAll('.corn').forEach(x => x.remove());
+	cur.world.querySelectorAll('.corn').forEach(x => x.remove());
 	corns = cur.corn.map(c => {
 		const e = document.createElement('div');
 		e.className = 'corn';
 		e.style.left = c.x + '%';
 		e.style.top = c.t + '%';
 		e.innerHTML = '<img src="assets/corn.png" alt="Maíz">';
-		cur.game.append(e);
+		cur.world.append(e);
 		return { e, got: false };
 	});
 	toxics = cur.toxic.map(c => {
@@ -169,14 +202,26 @@ function makeCorn() {
 		e.style.left = c.x + '%';
 		e.style.top = c.t + '%';
 		e.innerHTML = '<img src="assets/corn-toxic.png" alt="Maíz tóxico">';
-		cur.game.append(e);
+		cur.world.append(e);
 		return { e };
 	});
 }
 
+/* Cámara: desplaza `world` en Y para que el mundo largo del Nivel 2 avance
+   con el jugador. En el Nivel 1, world===game y worldH=100, así que el
+   cálculo da siempre "sin scroll" (equivale al comportamiento original). */
+function updateCamera() {
+	if (cur.world === cur.game) return;
+	const maxScroll = cur.worldH - 100;
+	const s = Math.min(Math.max(pos.y - cur.anchorY, 0), maxScroll);
+	const tyU = (100 - cur.worldH) + s; // en HVU
+	cur.world.style.transform = `translateY(${(tyU / cur.worldH * 100).toFixed(4)}%)`;
+}
+
 function draw() {
 	cur.chicken.style.left = `calc(${pos.x}% - ${cur.chickenHalf}px)`;
-	cur.chicken.style.bottom = pos.y + '%';
+	cur.chicken.style.bottom = (pos.y / cur.worldH * 100) + '%';
+	updateCamera();
 }
 
 function start() {
