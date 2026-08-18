@@ -101,7 +101,13 @@ function randomEggType() {
 function spawnEgg(type = randomEggType()) {
 	const cell = randomFreeCell();
 	if (!cell) return;
-	eggs.push({ ...cell, type, expiresAt: type === 'broken' ? performance.now() + 10000 : 0 });
+	eggs.push({ ...cell, type, expiresAt: type === 'broken' ? performance.now() + 8000 : 0 });
+	// If a broken egg appears, also spawn an additional healthy egg
+	// so the player still has something to eat while the broken one
+	// is present.
+	if (type === 'broken') {
+		spawnEgg('normal');
+	}
 }
 
 function fillEggs() {
