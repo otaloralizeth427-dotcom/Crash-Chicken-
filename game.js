@@ -5,7 +5,7 @@ const tagline = document.querySelector('#tagline');
 const help = document.querySelector('#help');
 const levelUp = document.querySelector('#levelUp');
 const toLevel2Btn = document.querySelector('#toLevel2');
-const game1El = document.querySelector('#game');
+const introEl = document.querySelector('#intro');
 const game2El = document.querySelector('#game2');
 const world2El = document.querySelector('#world2');
 
@@ -114,36 +114,20 @@ function makeLevel2Items() {
 }
 const level2Items = makeLevel2Items();
 
-/* ===== configuración de ambos niveles =====
+/* ===== configuración del nivel activo =====
+   Esta rama contiene únicamente el Nivel 2 (el Nivel 1 vive en `main` y se
+   integrará por separado). La página arranca mostrando directamente la
+   pantalla de transición "¡Pasaste al Nivel 2!" (#intro/#levelUp) y ENTER
+   / el botón CONTINUAR lleva a la partida.
    `game`   = sección visible/tabindex (se muestra/oculta, recibe foco y
               los controles táctiles).
    `world`  = raíz donde viven carreteras/autos/maíz/pollito y sobre la que
-              se posicionan en %. En el Nivel 1 es la misma que `game`; en
-              el Nivel 2 es #world2 (el mundo largo que hace scroll).
-   `worldH` = alto del mundo en HVU (100 = mismo alto que la ventana, sin
-              scroll: así el Nivel 1 usa exactamente la misma fórmula).
+              se posicionan en % — #world2, el mundo largo que hace scroll.
+   `worldH` = alto del mundo en HVU (100 equivaldría al mismo alto que la
+              ventana, sin scroll).
    `anchorY`= HVU desde abajo en los que la cámara empieza a seguir al
-              jugador (antes de eso se ve tal cual, como en el Nivel 1). */
+              jugador (antes de eso se ve tal cual). */
 const boards = {
-	1: {
-		num: 1,
-		game: game1El,
-		world: game1El,
-		chicken: document.querySelector('#chicken'),
-		chickenHalf: 29,
-		message: document.querySelector('#message'),
-		play: document.querySelector('#play'),
-		startY: 4, stepY: 10, winY: 91, worldH: 100, anchorY: 100,
-		lanes: [
-			{ top: 17, d: 1, s: 12, h: [275, 190], x: [10, 66] },
-			{ top: 47, d: -1, s: 17, h: [35, 195], x: [10, 66] },
-			{ top: 77, d: 1, s: 22, h: [110, 260, 45], x: [0, 36, 75] }
-		],
-		corn: [{ x: 30, t: 45 }, { x: 73, t: 75 }],
-		toxic: [],
-		tagline: 'CRUZA SIN MIRAR ATRÁS',
-		helpText: 'Recoge maíz (+25). Pulsa R para reiniciar.'
-	},
 	2: {
 		num: 2,
 		game: game2El,
@@ -162,7 +146,7 @@ const boards = {
 };
 
 /* ===== estado de juego (compartido, opera sobre el nivel activo `cur`) ===== */
-let cur = boards[1];
+let cur = boards[2];
 let playing = false, score = 0, pos = { x: 50, y: cur.startY }, cars = [], corns = [], toxics = [], last = 0, frame;
 
 function setLevel(n) {
@@ -208,10 +192,9 @@ function makeCorn() {
 }
 
 /* Cámara: desplaza `world` en Y para que el mundo largo del Nivel 2 avance
-   con el jugador. En el Nivel 1, world===game y worldH=100, así que el
-   cálculo da siempre "sin scroll" (equivale al comportamiento original). */
+   con el jugador (si worldH fuera 100 —igual que la ventana— no habría
+   scroll, pero el Nivel 2 siempre usa un mundo más alto). */
 function updateCamera() {
-	if (cur.world === cur.game) return;
 	const maxScroll = cur.worldH - 100;
 	const s = Math.min(Math.max(pos.y - cur.anchorY, 0), maxScroll);
 	const tyU = (100 - cur.worldH) + s; // en HVU
@@ -248,7 +231,7 @@ function hideLevelUp() {
 
 function startLevel2() {
 	hideLevelUp();
-	boards[1].game.classList.add('hidden');
+	introEl.classList.add('hidden');
 	boards[2].game.classList.remove('hidden');
 	setLevel(2);
 	start();
@@ -261,11 +244,6 @@ function end(win = false) {
 		best = score;
 		localStorage.setItem('crashChickenBest', best);
 		bestEl.textContent = best;
-	}
-	if (win && cur.num === 1) {
-		cur.message.classList.remove('show');
-		showLevelUp();
-		return;
 	}
 	cur.message.classList.toggle('crash', !win);
 	cur.message.querySelector('h2').textContent = win ? '¡Lo lograste! 🏁' : '¡Crash!';
@@ -350,16 +328,12 @@ function attachTouch(el) {
 		else move(dy < 0 ? 'ArrowUp' : 'ArrowDown');
 	});
 }
-attachTouch(boards[1].game);
+attachTouch(introEl);
 attachTouch(boards[2].game);
 
 /* ===== botones ===== */
 toLevel2Btn.onclick = startLevel2;
-boards[1].play.onclick = () => { setLevel(1); start(); };
 boards[2].play.onclick = () => { setLevel(2); start(); };
 
-/* ===== estado inicial ===== */
-setLevel(1);
-draw();
-makeCars();
-makeCorn();
+/* ===== estado inicial: arranca directo en la pantalla de transición ===== */
+setLevel(2);
