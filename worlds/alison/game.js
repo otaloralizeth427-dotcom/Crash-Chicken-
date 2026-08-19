@@ -7,7 +7,6 @@ const tagline = document.querySelector('#tagline');
 const help = document.querySelector('#help');
 const message4 = document.querySelector('#message4');
 const play4 = document.querySelector('#play4');
-const backMenu = document.querySelector('#backMenu');
 const world4State = document.querySelector('#world4State');
 const worldCards = [...document.querySelectorAll('.world-card')];
 
@@ -300,7 +299,6 @@ worldMenu.addEventListener('click', e => {
 	startWorld4(world);
 });
 play4.onclick = startWorld4;
-backMenu.onclick = showMenu;
 attachSnakeTouch(game4);
 buildBoard();
 showMenu();
