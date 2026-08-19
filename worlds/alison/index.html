@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Crash Chicken</title><link rel="stylesheet" href="style.css"></head><body>
+<main>
+	<header>
+		<div>
+			<p>CRUZA SIN MIRAR ATRÁS</p>
+			<h1>CRASH <span>CHICKEN</span></h1>
+		</div>
+		<div class="score">
+			<div>PUNTOS<b id="score">0</b></div>
+			<div>RÉCORD<b id="best">0</b></div>
+		</div>
+	</header>
+
+	<h2 id="tagline">ELIGE TU MUNDO</h2>
+
+	<div id="worldMenu" class="world-menu" tabindex="0">
+		<!-- En esta rama solo mostramos el Mundo 4 -->
+		<div class="world-card" data-world="4">
+			<span>Mundo 4</span>
+			<b>Snake Chicken</b>
+			<small id="world4State">Entrar</small>
+		</div>
+	</div>
+
+	<div id="game4" class="hidden" tabindex="0">
+		<div id="snakeBoard"></div>
+		<div id="message4" class="">
+			<img id="dead4" src="assets/chicken-hit.png" alt="Pollito caído">
+			<h2>¡Crash!</h2>
+			<p>No toques las paredes ni la cola.</p>
+			<button id="play4">JUGAR MUNDO 4</button>
+			<button id="backMenu">VOLVER</button>
+		</div>
+	</div>
+
+	<p id="help" class="help">Recoge huevos y haz crecer al pollito.</p>
+	<footer>Creado por Nathalia Otálora, Estaban Molina y Alison Loango</footer>
+</main>
+<script src="game.js"></script>
+</body>
+</html>
