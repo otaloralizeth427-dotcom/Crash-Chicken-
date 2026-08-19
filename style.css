@@ -1,2 +1,59 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@800;900&display=swap');
-*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at top,#dff2c2,#7ab35b);font-family:Nunito,sans-serif;color:#193041}main{width:min(1000px,94vw);padding:22px 0}header{display:flex;align-items:end;justify-content:space-between;margin:0 4px 16px}header p{margin:0;color:#457836;font-size:.7rem;letter-spacing:.16em}h1{margin:0;font:700 clamp(2rem,5vw,3.5rem)/.9 Fredoka;color:#fff6d5;text-shadow:0 4px #31512c}h1 span{color:#ffcf4e}button{border:0;border-radius:999px;padding:12px 22px;background:#ffce4c;color:#314029;box-shadow:0 4px #b47625;font:900 1rem Nunito;cursor:pointer;touch-action:manipulation}#menu{padding:clamp(28px,7vw,70px) 20px;text-align:center;border:5px solid #25462d;border-radius:22px;background:linear-gradient(145deg,#fff4c9,#d6eeaf);box-shadow:0 10px #25462d}#menu h2{margin:0;color:#31512c;font:700 clamp(1.6rem,5vw,3rem) Fredoka}#menu p{margin:12px auto 25px}.hidden{display:none!important}#menu button{margin:6px}.world-label{text-align:center;margin-bottom:10px;color:#fff0b5;font:700 1rem Fredoka;text-shadow:0 2px #31512c}#stage iframe{display:block;width:100%;height:min(76vh,700px);min-height:500px;border:5px solid #25462d;border-radius:22px;background:#6eb245;box-shadow:0 10px #25462d}#help,footer{text-align:center;color:#335b32;font-size:.85rem;font-weight:800}#help{margin:19px 0 8px}footer{font-size:.75rem}@media(max-width:600px){body{padding:0 8px}main{width:100%;padding:12px 0}header{align-items:center;margin-bottom:10px}header p{font-size:.55rem}h1{font-size:clamp(1.7rem,9vw,3rem)}#stage iframe{height:78vh;min-height:430px;border-width:4px}.menu-actions{grid-template-columns:1fr}#menu button{display:block;width:min(100%,360px);margin:10px auto}#help{padding:0 10px;font-size:.75rem}footer{padding:0 8px;font-size:.65rem}}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at top,#dff2c2,#7ab35b);font-family:Nunito,sans-serif;color:#193041}
+main{width:min(1000px,94vw);padding:22px 0}
+header{display:flex;align-items:end;justify-content:space-between;margin:0 4px 16px}
+header p{margin:0;color:#457836;font-size:.7rem;letter-spacing:.16em}
+h1{margin:0;font:700 clamp(2rem,5vw,3.5rem)/.9 Fredoka;color:#fff6d5;text-shadow:0 4px #31512c}
+h1 span{color:#ffcf4e}
+button{border:0;border-radius:999px;padding:12px 22px;background:#ffce4c;color:#314029;box-shadow:0 4px #b47625;font:900 1rem Nunito;cursor:pointer;touch-action:manipulation}
+.hidden{display:none!important}
+
+/* Pantalla de selección */
+#menu{padding:clamp(24px,6vw,48px) clamp(16px,4vw,32px);text-align:center;border:5px solid #25462d;border-radius:22px;background:linear-gradient(145deg,#fff4c9,#d6eeaf);box-shadow:0 10px #25462d}
+#menu h2{margin:0;color:#31512c;font:700 clamp(1.6rem,5vw,3rem) Fredoka}
+#menu p{margin:12px auto 22px}
+#menu>button{margin:0 0 26px}
+
+.world-menu{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
+.world-card{position:relative;display:grid;align-content:end;gap:8px;min-height:300px;padding:18px;border:4px solid #305633;border-radius:18px;background:linear-gradient(#9bdc68,#5daf52);color:#fff7d9;box-shadow:0 8px #234329, inset 0 0 0 5px #d8f29a66;text-align:left;font-family:Nunito,sans-serif;cursor:pointer;transition:transform .18s,filter .18s}
+.world-card:before{content:"";position:absolute;inset:16px 12px auto;height:150px;background:url('assets/chicken-level2.png') center/contain no-repeat;filter:drop-shadow(0 7px 2px #1d3c2288);transition:transform .2s}
+.world-card[data-world="2"]:before{background-image:url('assets/car.png')}
+.world-card[data-world="3"]:before{background-image:url('assets/chicken-power.png')}
+.world-card:hover{transform:translateY(-8px) rotate(-1deg);filter:saturate(1.08)}
+.world-card:hover:before{transform:translateY(-12px) scale(1.08) rotate(4deg)}
+.world-card span{font:700 1rem Fredoka;letter-spacing:.08em;text-transform:uppercase;text-shadow:0 2px #31512c}
+.world-card b{font:900 clamp(1.4rem,2vw,2rem)/1 Fredoka;text-shadow:0 3px #31512c}
+.world-card small{font-size:.82rem;font-weight:900;color:#284229;background:#fff6d8;border:3px solid #31512c;border-radius:999px;padding:7px 10px;justify-self:start}
+
+/* Escenario del mundo activo */
+.stage-bar{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:10px}
+#backToMenu{padding:9px 18px;font-size:.85rem;background:#fff6d8;box-shadow:0 4px #8e6b30}
+.world-label{color:#fff0b5;font:700 1rem Fredoka;text-shadow:0 2px #31512c}
+#stage iframe{display:block;width:100%;height:min(92vh,940px);min-height:640px;border:5px solid #25462d;border-radius:22px;background:#6eb245;box-shadow:0 10px #25462d}
+
+#help,footer{text-align:center;color:#335b32;font-size:.85rem;font-weight:800}
+#help{margin:19px 0 8px}
+footer{font-size:.75rem}
+
+@media(max-width:760px){
+  .world-menu{grid-template-columns:repeat(2,1fr)}
+  .world-card{min-height:230px}
+  .world-card:before{height:100px}
+}
+@media(max-width:600px){
+  body{padding:0 8px}
+  main{width:100%;padding:12px 0}
+  header{align-items:center;margin-bottom:10px}
+  header p{font-size:.55rem}
+  h1{font-size:clamp(1.7rem,9vw,3rem)}
+  .world-menu{grid-template-columns:1fr}
+  .world-card{min-height:170px}
+  .world-card:before{left:auto;right:12px;width:110px;height:110px}
+  #stage iframe{height:88vh;min-height:520px;border-width:4px}
+  #help{padding:0 10px;font-size:.75rem}
+  footer{padding:0 8px;font-size:.65rem}
+}
+@media(max-height:600px){
+  #stage iframe{height:min(480px,86vh);min-height:360px}
+}
