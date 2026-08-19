@@ -7,17 +7,11 @@ function move(k){if(!playing)return;let s=world===2?8:10;if(['ArrowUp','w','W'].
 function finish(){world2()}
 function world2(){world=2;game.classList.add('world-two');help.textContent='Llega al portal rojo sin que te golpeen los objetos.';document.querySelectorAll('.car,.corn').forEach(x=>x.remove());clean();score=0;scoreEl.textContent=score;pos={x:50,y:8};world2Time=0;spawnTimer=.25;draw();message.classList.remove('show','crash');playing=true;last=performance.now();game.focus();cancelAnimationFrame(frame);frame=requestAnimationFrame(loop)}
 document.addEventListener('keydown',()=>{if(world===2&&playing&&pos.y>=88)end(false)});
-const isMobile=window.matchMedia('(max-width: 700px), (pointer: coarse)').matches;
-let lastMobileSpawn=0;
-function spawn(){if(isMobile&&performance.now()-lastMobileSpawn<700)return;if(isMobile)lastMobileSpawn=performance.now();let e=document.createElement('div');e.className=Math.random()>.45?'falling falling-corn':'falling falling-car';e.innerHTML=e.classList.contains('falling-car')?'<img src="car.png" alt="Objeto que cae">':'<img src="corn.png" alt="Objeto que cae">';game.append(e);falling.push({e,x:4+Math.random()*92,y:-12,speed:24+Math.random()*20+world2Time*1.5,spin:Math.random()*80-40})}
-setInterval(()=>{if(!isMobile&&world===2&&playing){spawn();if(Math.random()>.35)spawn()}},450);
-setInterval(()=>{if(isMobile)document.querySelectorAll('.falling').forEach(e=>{if(parseFloat(e.style.top)>110)e.remove()})},1000);
+setInterval(()=>{if(world===2&&playing){spawn();if(Math.random()>.35)spawn()}},450);
 // Esta rama contiene únicamente el mundo 2 de Esteban.
 document.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='r'){e.preventDefault();world2()}});
 world2();
 function end(crash=true){playing=false;cancelAnimationFrame(frame);game.classList.remove('shaking');score=Math.max(0,score);if(world===2&&!crash){score+=10;scoreEl.textContent=score}if(score>best){best=score;localStorage.setItem('crashChickenBest',best);bestEl.textContent=best}show(crash?'¡Crash!':'¡Meta alcanzada!',crash?`Conseguiste ${score} puntos.`:`¡Llegaste a salvo! +10 puntos. Total: ${score}`,world===2?'REPETIR MUNDO 2':'REINTENTAR',crash)}
 let touchStart=null;
-game.addEventListener('touchstart',event=>{if(event.target.closest('button')){touchStart=null;return}touchStart=event.changedTouches[0];event.preventDefault()},{passive:false});
-game.addEventListener('touchend',event=>{if(!touchStart)return;if(event.target.closest('button')){touchStart=null;return}const touch=event.changedTouches[0],dx=touch.clientX-touchStart.clientX,dy=touch.clientY-touchStart.clientY;touchStart=null;if(Math.max(Math.abs(dx),Math.abs(dy))<18)return;move(Math.abs(dx)>Math.abs(dy)?(dx>0?'ArrowRight':'ArrowLeft'):(dy>0?'ArrowDown':'ArrowUp'));event.preventDefault()},{passive:false});
-function move(k){if(!playing)return;let s=isMobile?14:(world===2?8:10);if(['ArrowUp','w','W'].includes(k))pos.y=Math.min(world===2?88:91,pos.y+s);if(['ArrowDown','s','S'].includes(k))pos.y=Math.max(world===2?8:4,pos.y-s);if(['ArrowLeft','a','A'].includes(k))pos.x=Math.max(4,pos.x-s);if(['ArrowRight','d','D'].includes(k))pos.x=Math.min(96,pos.x+s);if(world===2&&pos.y>=88)return end(false);draw()}
-play.addEventListener('touchend',event=>{event.preventDefault();event.stopPropagation();start()},{passive:false});
+game.addEventListener('touchstart',event=>{touchStart=event.changedTouches[0];event.preventDefault()},{passive:false});
+game.addEventListener('touchend',event=>{if(!touchStart)return;const touch=event.changedTouches[0],dx=touch.clientX-touchStart.clientX,dy=touch.clientY-touchStart.clientY;touchStart=null;if(Math.max(Math.abs(dx),Math.abs(dy))<18)return;move(Math.abs(dx)>Math.abs(dy)?(dx>0?'ArrowRight':'ArrowLeft'):(dy>0?'ArrowDown':'ArrowUp'));event.preventDefault()},{passive:false});
