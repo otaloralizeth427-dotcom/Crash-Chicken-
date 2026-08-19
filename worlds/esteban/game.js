@@ -15,4 +15,3 @@ function end(crash=true){playing=false;cancelAnimationFrame(frame);game.classLis
 let touchStart=null;
 game.addEventListener('touchstart',event=>{touchStart=event.changedTouches[0];event.preventDefault()},{passive:false});
 game.addEventListener('touchend',event=>{if(!touchStart)return;const touch=event.changedTouches[0],dx=touch.clientX-touchStart.clientX,dy=touch.clientY-touchStart.clientY;touchStart=null;if(Math.max(Math.abs(dx),Math.abs(dy))<18)return;move(Math.abs(dx)>Math.abs(dy)?(dx>0?'ArrowRight':'ArrowLeft'):(dy>0?'ArrowDown':'ArrowUp'));event.preventDefault()},{passive:false});
-function move(k){if(!playing)return;let s=world===2?8:10;if(['ArrowUp','w','W'].includes(k))pos.y=Math.min(world===2?88:91,pos.y+s);if(['ArrowDown','s','S'].includes(k))pos.y=Math.max(world===2?8:4,pos.y-s);if(['ArrowLeft','a','A'].includes(k))pos.x=Math.max(4,pos.x-s);if(['ArrowRight','d','D'].includes(k))pos.x=Math.min(96,pos.x+s);if(world===2&&pos.y>=88)return end(false);draw()}
